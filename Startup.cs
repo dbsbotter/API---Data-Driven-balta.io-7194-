@@ -1,3 +1,4 @@
+using System;
 using System.Linq;
 using System.Text;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -73,7 +74,9 @@ namespace Shop
             });
         }
 
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+        public void Configure(IApplicationBuilder app,
+                              IWebHostEnvironment env,
+                              IServiceProvider provider)
         {
             if (env.IsDevelopment())
             {
@@ -101,6 +104,14 @@ namespace Shop
             {
                 endpoints.MapControllers();
             });
+
+            if (env.IsProduction())
+            {
+                using (var context = provider.GetService<DataContext>())
+                {
+                    context.Database.Migrate();
+                }
+            }
         }
     }
 }
